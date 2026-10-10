@@ -1,0 +1,6 @@
+{
+  "name": "Smart Tourist Safety — Responder EOC Dashboard",
+  "description": "Smart Tourist Safety Monitoring & Incident Response System for Police and Authorized Responders using AI Anomaly Detection, Geo-Fencing, and Digital Tourist Identity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
