@@ -66,10 +66,13 @@ interface OperationalContextValue {
   audioMuted: boolean;
   demoModeOpen: boolean;
   demoWorkflowStep: number;
+  themeMode: 'light' | 'dark';
   toasts: ToastItem[];
   setConnectivityState: (state: SystemConnectivityState) => void;
   setAudioMuted: (muted: boolean) => void;
   setDemoModeOpen: (open: boolean) => void;
+  setThemeMode: (mode: 'light' | 'dark') => void;
+  toggleThemeMode: () => void;
   showToast: (message: string, variant?: ToastItem['variant']) => void;
   dismissToast: (id: string) => void;
   retryLoadData: () => Promise<void>;
@@ -146,7 +149,38 @@ export const OperationalProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
   const [demoModeOpen, setDemoModeOpen] = useState<boolean>(false);
   const [demoWorkflowStep, setDemoWorkflowStep] = useState<number>(1);
+  const [themeMode, setThemeModeState] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('sts_theme_mode');
+      if (saved === 'dark' || saved === 'light') return saved;
+    } catch {
+      // ignore storage errors
+    }
+    return 'light';
+  });
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (themeMode === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    try {
+      localStorage.setItem('sts_theme_mode', themeMode);
+    } catch {
+      // ignore
+    }
+  }, [themeMode]);
+
+  const setThemeMode = useCallback((mode: 'light' | 'dark') => {
+    setThemeModeState(mode);
+  }, []);
+
+  const toggleThemeMode = useCallback(() => {
+    setThemeModeState((prev) => (prev === 'light' ? 'dark' : 'light'));
+  }, []);
 
   const showToast = useCallback(
     (message: string, variant: ToastItem['variant'] = 'PRIMARY') => {
@@ -1283,10 +1317,13 @@ export const OperationalProvider: React.FC<{ children: React.ReactNode }> = ({ c
         audioMuted,
         demoModeOpen,
         demoWorkflowStep,
+        themeMode,
         toasts,
         setConnectivityState,
         setAudioMuted,
         setDemoModeOpen,
+        setThemeMode,
+        toggleThemeMode,
         showToast,
         dismissToast,
         retryLoadData,
